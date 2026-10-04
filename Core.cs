@@ -13,22 +13,6 @@ using CustomDistributionAPI;
 
 namespace DifferentRopeMaterials
 {
-    public class InitializePatch
-    {
-        internal static void Postfix(NetworkPrefab __instance)
-        {
-            switch (__instance.Hash)
-            {
-                case 43836u: // This is Rope Clump
-                    PhysicalMaterialPart physicalMaterialPart = __instance.gameObject.GetComponent<PhysicalMaterialPart>();
-                    typeof(PhysicalMaterialPart).GetField("materialDistribution", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(physicalMaterialPart, Core.ropeMaterialDistribution);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
     public class Core : MelonMod
     {
         public static Distribution ropeMaterialDistribution;
@@ -50,7 +34,9 @@ namespace DifferentRopeMaterials
             typeof(Distribution.BaseItem).GetField("noAttributeValue", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(item_rope, 1f);
             typeof(Distribution.BaseItem).GetField("multipliers", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(item_rope, new AttributeCurveRange[] { });
             ropeMaterialDistribution.GetType().GetField("items", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(ropeMaterialDistribution, new List<Distribution.Item> { item_rope });
-            HarmonyInstance.Patch(AccessTools.Method(typeof(NetworkPrefab), "Initialize"), postfix: new HarmonyMethod(typeof(InitializePatch), nameof(InitializePatch.Postfix)));
+            GameObject ropeClump = (GameObject)Resources.Load("network prefabs/crafting/crafting materials prefabs/Rope Clump");
+            PhysicalMaterialPart physicalMaterialPart = ropeClump.GetComponent<PhysicalMaterialPart>();
+            typeof(PhysicalMaterialPart).GetField("materialDistribution", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(physicalMaterialPart, Core.ropeMaterialDistribution);
         }
     }
 }
